@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
+import django_redis
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -139,3 +141,22 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://localhost:6379',  # Replace with your Redis server details
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Set sessions to expire when the user closes the browser
+SESSION_COOKIE_SECURE = True  # Only transmit the session cookie over HTTPS for security
+SESSION_COOKIE_HTTPONLY = True  # Restrict JavaScript access to the session cookie
+SESSION_SAVE_EVERY_REQUEST = True  # Save the session on each request

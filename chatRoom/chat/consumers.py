@@ -1,5 +1,4 @@
 import json
-import uuid
 
 from django.contrib.sessions.models import Session
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -9,14 +8,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = "chat_%s" % self.room_name
-        self.user = uuid.uuid4().__str__()
+        self.user = self.scope["session"].get("nickname")
+
         # Join room group
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
         await self.accept()
 
         await self.channel_layer.group_send(
-            self.room_group_name, {"type": "chat_message", "message": f"Welcome {self.user}", "username": self.user}
+            self.room_group_name, {"type": "chat_message", "message": f"Welcome {self.user}", "username": "ALL"}
         )
 
     async def disconnect(self, close_code):
